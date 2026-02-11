@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>ARWA PLEASE</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --bg1: #2b0000;
+      --bg2: #5c0000;
+      --card: rgba(40, 0, 0, 0.9);
+      --yes: #ff0000;
+      --yesHover: #b30000;
+      --text: #ffffff;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at top, var(--bg2), var(--bg1));
+      font-family: system-ui, sans-serif;
+      overflow: hidden;
+      padding: 16px;
+      color: var(--text);
+    }
+
+    #confettiCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .card {
+      width: min(500px, 92vw);
+      padding: 30px;
+      background: var(--card);
+      backdrop-filter: blur(15px);
+      border-radius: 25px;
+      text-align: center;
+      box-shadow: 0 18px 60px rgba(0,0,0,0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      z-index: 10;
+    }
+
+    h1 {
+      font-size: clamp(22px, 5vw, 32px);
+      margin-bottom: 30px;
+      line-height: 1.2;
+    }
+
+    /* ALIGN BUTTONS SIDE BY SIDE */
+    .button-zone {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      min-height: 100px;
+    }
+
+    button {
+      padding: 14px 28px;
+      font-size: 18px;
+      font-weight: 800;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      user-select: none;
+      transition: transform 0.1s ease;
+    }
+
+    #yesBtn {
+      background: var(--yes);
+      color: #fff;
+      box-shadow: 0 0 20px rgba(255,0,0,0.4);
+      position: relative;
+      z-index: 11;
+    }
+
+    #noBtn {
+      background: #444;
+      color: #fff;
+      position: relative;
+      z-index: 999; /* Stays on top when moving */
+    }
+
+    .hint {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #ff9999;
+      font-style: italic;
+    }
+
+    /* RESULT GIF STYLING */
+    .result {
+      display: none;
+      animation: pop .35s ease;
+    }
+
+    .fireworks {
+      width: 100%;
+      max-height: 45vh; /* Prevents it from being too big for the window */
+      object-fit: contain;
+      border-radius: 15px;
+      margin-top: 15px;
+    }
+
+    @keyframes pop {
+      from { transform: scale(.9); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="confettiCanvas"></canvas>
+
+  <main class="card" id="mainCard">
+    <h1>Arwa, will you be my valentine?</h1>
+    
+    <div class="button-zone">
+      <button id="yesBtn">Yes</button>
+      <button id="noBtn">No</button>
+    </div>
+
+    <div class="hint">Ghadi Tkhtari YES BZZ MNK 😇</div>
+  </main>
+
+  <div id="result" class="card" style="display:none;">
+    <h1>YAYYYYY! Chftiii ana chhal WAAA3RR 🎉</h1>
+    <img 
+      class="fireworks" 
+      src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExdWU3eHFoMWFjN2h4Y3NmMm5idXJoems2Y3B0b3hxajV4dnZzenE5MSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/h3wYhYEzcq3pXSfmD6/giphy.gif" 
+      alt="Cat Celebration"
+    >
+  </div>
+
+  <script>
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const mainCard = document.getElementById("mainCard");
+    const result = document.getElementById("result");
+
+    /* --- NO BUTTON LOGIC --- */
+    const moveNo = () => {
+      // Stay inside the window borders
+      const maxX = window.innerWidth - noBtn.offsetWidth - 20;
+      const maxY = window.innerHeight - noBtn.offsetHeight - 20;
+      
+      const newX = Math.max(10, Math.random() * maxX);
+      const newY = Math.max(10, Math.random() * maxY);
+
+      noBtn.style.position = "fixed";
+      noBtn.style.left = newX + "px";
+      noBtn.style.top = newY + "px";
+      
+      growYes();
+    };
+
+    /* --- YES BUTTON GROWTH LIMIT --- */
+    let yesScale = 1;
+    function growYes() {
+      if (yesScale < 2.5) { // Maximum limit so it doesn't hide everything
+        yesScale += 0.15;
+        yesBtn.style.transform = `scale(${yesScale})`;
+      }
+    }
+
+    // Move on Hover & Touch
+    noBtn.addEventListener("mouseover", moveNo);
+    noBtn.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      moveNo();
+    });
+
+    /* --- SUCCESS ACTION --- */
+    yesBtn.addEventListener("click", () => {
+      mainCard.style.display = "none";
+      noBtn.style.display = "none";
+      result.style.display = "block";
+      
+      confetti({
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#ff0000', '#ffffff', '#000000']
+      });
+    });
+  </script>
+</body>
+</html>
